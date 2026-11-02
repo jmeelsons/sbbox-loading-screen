@@ -14,56 +14,71 @@
         box-sizing: border-box;
     }
 
+    html, body {
+        width: 100%;
+        height: 100%;
+    }
+
     body {
         font-family: 'Roboto', 'Segoe UI', Tahoma, sans-serif;
         background: #1a1a1a;
         color: #e0e0e0;
-        height: 100vh;
         overflow: hidden;
         display: flex;
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        gap: 30px;
         position: relative;
     }
 
     .bg-layer {
         position: fixed;
-        inset: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
         z-index: -2;
         overflow: hidden;
-        filter: blur(3px);
-        transform: scale(1.03);
     }
 
     .bg-layer .bg-slide {
         position: absolute;
-        inset: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
         background-position: center center;
         background-size: cover;
         background-repeat: no-repeat;
         opacity: 0;
+        -webkit-transform: scale(1.08);
         transform: scale(1.08);
+        -webkit-transition: opacity 2s ease, -webkit-transform 8s ease;
         transition: opacity 2s ease, transform 8s ease;
-        will-change: opacity, transform;
     }
 
     .bg-layer .bg-slide.active {
         opacity: 1;
+        -webkit-transform: scale(1.03);
         transform: scale(1.03);
     }
 
     .bg-overlay {
         position: fixed;
-        inset: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
         background: rgba(0, 0, 0, 0.55);
         z-index: -1;
     }
 
     .blackout {
         position: fixed;
-        inset: 0;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
         background: #000;
         z-index: 100;
         opacity: 1;
@@ -86,29 +101,37 @@
         text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
 
         opacity: 0;
+        -webkit-transform: translateY(120px);
         transform: translateY(120px);
 
+        -webkit-animation:
+            slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards,
+            pulse 2.5s ease-in-out 1.5s infinite;
         animation:
             slideUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards,
             pulse 2.5s ease-in-out 1.5s infinite;
+        -webkit-animation-play-state: paused;
         animation-play-state: paused;
     }
 
     .server-name.start {
+        -webkit-animation-play-state: running;
         animation-play-state: running;
     }
 
+    @-webkit-keyframes slideUp {
+        from { opacity: 0; -webkit-transform: translateY(120px); }
+        to   { opacity: 1; -webkit-transform: translateY(0); }
+    }
     @keyframes slideUp {
-        from {
-            opacity: 0;
-            transform: translateY(120px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(120px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
+    @-webkit-keyframes pulse {
+        0%, 100% { opacity: 1; }
+        50%      { opacity: 0.75; }
+    }
     @keyframes pulse {
         0%, 100% { opacity: 1; }
         50%      { opacity: 0.75; }
@@ -119,29 +142,32 @@
         width: 100%;
         max-width: 650px;
         min-height: 3em;
+        margin-top: 30px;
         display: flex;
         align-items: center;
         justify-content: center;
 
         opacity: 0;
+        -webkit-transform: translateY(80px);
         transform: translateY(80px);
+        -webkit-animation: slideUpHint 1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
         animation: slideUpHint 1s cubic-bezier(0.16, 1, 0.3, 1) 0.25s forwards;
+        -webkit-animation-play-state: paused;
         animation-play-state: paused;
     }
 
     .hint-wrapper.start {
+        -webkit-animation-play-state: running;
         animation-play-state: running;
     }
 
+    @-webkit-keyframes slideUpHint {
+        from { opacity: 0; -webkit-transform: translateY(80px); }
+        to   { opacity: 1; -webkit-transform: translateY(0); }
+    }
     @keyframes slideUpHint {
-        from {
-            opacity: 0;
-            transform: translateY(80px);
-        }
-        to {
-            opacity: 1;
-            transform: translateY(0);
-        }
+        from { opacity: 0; transform: translateY(80px); }
+        to   { opacity: 1; transform: translateY(0); }
     }
 
     .hint {
@@ -155,24 +181,23 @@
         width: 100%;
 
         opacity: 1;
+        -webkit-transform: translateY(0);
         transform: translateY(0);
-        filter: blur(0);
-        transition:
-            opacity 0.6s ease,
-            transform 0.6s ease,
-            filter 0.6s ease;
+        -webkit-transition: opacity 0.6s ease, -webkit-transform 0.6s ease;
+        transition: opacity 0.6s ease, transform 0.6s ease;
     }
 
     .hint.hiding {
         opacity: 0;
+        -webkit-transform: translateY(-10px);
         transform: translateY(-10px);
-        filter: blur(4px);
     }
 
     .hint.showing {
         opacity: 0;
+        -webkit-transform: translateY(10px);
         transform: translateY(10px);
-        filter: blur(4px);
+        -webkit-transition: none;
         transition: none;
     }
 
@@ -198,7 +223,7 @@
     </div>
 
 <script>
-    const backgrounds = [
+    var backgrounds = [
         'images/1.jpg',
         'images/2.jpg',
         'images/3.jpg',
@@ -206,72 +231,75 @@
         'images/5.jpg',
         'images/6.jpg'
     ];
-    const BG_INTERVAL = 6000;
+    var BG_INTERVAL = 6000;
 
-    const hints = [
+    var hints = [
         'И тут начинается наша история...',
         'Скоро тут будет куча контента, но пока что пусто потому что сервер еще не известен...',
     ];
 
-    const bgLayer = document.getElementById('bgLayer');
-    const blackout = document.getElementById('blackout');
-    const serverName = document.getElementById('serverName');
-    const hintEl = document.getElementById('hint');
-    const hintWrapper = document.getElementById('hintWrapper');
+    var bgLayer = document.getElementById('bgLayer');
+    var blackout = document.getElementById('blackout');
+    var serverName = document.getElementById('serverName');
+    var hintEl = document.getElementById('hint');
+    var hintWrapper = document.getElementById('hintWrapper');
 
-    const slides = backgrounds.map((src, i) => {
-        const el = document.createElement('div');
-        el.className = 'bg-slide';
-        el.style.backgroundImage = `url('${src}')`;
-        if (i === 0) el.classList.add('active');
-        bgLayer.appendChild(el);
-        return el;
-    });
+    var slides = [];
+    for (var i = 0; i < backgrounds.length; i++) {
+        (function (src, index) {
+            var el = document.createElement('div');
+            el.className = 'bg-slide';
+            el.style.backgroundImage = 'url("' + src + '")';
+            if (index === 0) el.className += ' active';
+            bgLayer.appendChild(el);
+            slides.push(el);
+        })(backgrounds[i], i);
+    }
 
-    let currentSlide = 0;
+    var currentSlide = 0;
     function nextBackground() {
-        slides[currentSlide].classList.remove('active');
+        slides[currentSlide].className = 'bg-slide';
         currentSlide = (currentSlide + 1) % slides.length;
-        slides[currentSlide].classList.add('active');
+        slides[currentSlide].className = 'bg-slide active';
     }
 
     hintEl.innerHTML = hints[Math.floor(Math.random() * hints.length)];
 
-    let hintBusy = false;
+    var hintBusy = false;
     function showRandomHint() {
         if (hintBusy) return;
         hintBusy = true;
 
-        hintEl.classList.add('hiding');
+        hintEl.className = 'hint hiding';
 
-        setTimeout(() => {
-            hintEl.classList.remove('hiding');
-            hintEl.classList.add('showing');
+        setTimeout(function () {
+            hintEl.className = 'hint showing';
 
-            const randomIndex = Math.floor(Math.random() * hints.length);
+            var randomIndex = Math.floor(Math.random() * hints.length);
             hintEl.innerHTML = hints[randomIndex];
 
             void hintEl.offsetWidth;
 
-            hintEl.classList.remove('showing');
+            hintEl.className = 'hint';
             hintBusy = false;
         }, 600);
     }
-    setTimeout(() => {
-        blackout.classList.add('hidden');
 
-        setTimeout(() => {
-            serverName.classList.add('start');
-            hintWrapper.classList.add('start');
+    setTimeout(function () {
+        blackout.className = 'blackout hidden';
+
+        setTimeout(function () {
+            serverName.className = 'server-name start';
+            hintWrapper.className = 'hint-wrapper start';
         }, 100);
 
         setInterval(nextBackground, BG_INTERVAL);
 
-        setTimeout(() => {
+        setTimeout(function () {
             setInterval(showRandomHint, 4000);
         }, 2000);
 
-        setTimeout(() => {
+        setTimeout(function () {
             blackout.style.display = 'none';
         }, 1200);
     }, 2000);
